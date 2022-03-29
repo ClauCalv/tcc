@@ -2,6 +2,8 @@ module Types.Objects.Permanent where
 
 import Data.Class.Cycle
 
+import Types.Objects.BaseObject
+
 data Permanent = Permanent {
     baseObject :: BaseObject,
     permanentStatus :: PermanentStatus

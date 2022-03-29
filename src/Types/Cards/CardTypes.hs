@@ -11,3 +11,6 @@ type SubTypes = ES.EnumSet SubType
 data SuperType = AAAA
 data CardType = BBBB
 data SubType = CCCC
+
+emptyCTS :: CardTypeSet
+emptyCTS = CardTypeSet ES.empty ES.empty ES.empty

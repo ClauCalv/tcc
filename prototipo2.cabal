@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4962243b76d3e48a016a403688d5d07d3d7e78790d050bd2bc1ff79dae116e5b
+-- hash: 0a523bf64cd991e5c802c3756386a970f31ab51c9f892a3d5e91b1fe4b7f5e4d
 
 name:           prototipo2
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Data.Class.Cycle
+      Data.Class.Wrap
       Data.Dict
       Data.EnumMultiSet
       Effects.IOFormatter
@@ -39,6 +40,7 @@ library
       MagicGame
       RemoteGame
       Types.Cards
+      Types.Cards.Card
       Types.Cards.CardTypes
       Types.Colors
       Types.Costs.ManaCosts
@@ -46,7 +48,11 @@ library
       Types.MagicGameTypes
       Types.Mana
       Types.Objects.CardObject
-      Types.Objects.Objects
+      Types.Objects.Object
+      Types.Objects.Object.Class
+      Types.Objects.Object.Entity
+      Types.Objects.Object.Lenses
+      Types.Objects.Object.Test
       Types.Objects.Permanent
       Types.Players
       Types.Players.Player
@@ -54,6 +60,8 @@ library
       Types.World
       Types.Zones
       Types.Zones.Zone
+      Utils.MaybeEither
+      Utils.THUtils
   other-modules:
       Paths_prototipo2
   hs-source-dirs:
@@ -69,6 +77,8 @@ library
     , multiset
     , operational
     , optics
+    , optics-th
+    , template-haskell
     , text
   default-language: Haskell2010
 
@@ -90,7 +100,9 @@ executable prototipo2-exe
     , multiset
     , operational
     , optics
+    , optics-th
     , prototipo2
+    , template-haskell
     , text
   default-language: Haskell2010
 
@@ -113,6 +125,8 @@ test-suite prototipo2-test
     , multiset
     , operational
     , optics
+    , optics-th
     , prototipo2
+    , template-haskell
     , text
   default-language: Haskell2010

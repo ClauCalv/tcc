@@ -14,6 +14,6 @@ data World = World
     { _players           :: D.Dict Player
     , _priorityPlayer    :: D.RefOf Player
     , _turn              :: () -- TODO
-    , _zones             :: Zones
+    , _zones             :: () -- TODO
     }
 

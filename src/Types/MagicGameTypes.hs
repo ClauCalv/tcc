@@ -5,7 +5,7 @@ module Types.MagicGameTypes where
 
 import qualified Data.Dict as D
 import Types.World
-import Types.Player
+import Types.Players
 import Effects.Server
 
 data GameState = GameState

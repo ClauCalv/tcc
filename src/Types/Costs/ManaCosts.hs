@@ -10,6 +10,7 @@ data ManaCostElem = Generic | Colorless | Colored Color
 type BasicManaCost = EMS.EnumMultiSet ManaCostElem
 
 data ManaCost = 
+    EmptyCost |
     BasicManaCost BasicManaCost | 
     SpecialManaCost BasicManaCost [(SpecialManaCostElem, Int)]
         --deriving (Show, Read)

@@ -65,17 +65,7 @@ makeInitialState params = gameState
             { _players          = fst newPlayers
             , _priorityPlayer   = fst . head . snd $ newPlayers
             , _turn             = ()
-            , _zones            = zones
+            , _zones            = ()
             }
-
-        zones = Zones
-            { _exile        = D.empty
-            , _battlefield  = D.empty
-            , _stack        = D.empty
-            , _command      = D.empty
-            , _library      = D.fromList $ map (\(x,_) -> (x, D.empty)) $ snd newPlayers
-            , _hand         = D.fromList $ map (\(x,_) -> (x, D.empty)) $ snd newPlayers
-            , _graveyard    = D.fromList $ map (\(x,_) -> (x, D.empty)) $ snd newPlayers
-            } 
         
         

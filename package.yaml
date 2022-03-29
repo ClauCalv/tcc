@@ -25,6 +25,8 @@ dependencies:
 - mtl
 - operational
 - optics
+- optics-th
+- template-haskell
 - fused-effects == 1.1.*
 - fused-effects-optics
 - ilist
