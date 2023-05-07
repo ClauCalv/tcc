@@ -3,7 +3,7 @@
     -- ExistentialQuantification, -- Advanced types
     -- RankNTypes,                -- Advanced types
 
-    -- DataKinds,                 -- Defining new kinds
+    DataKinds,                    -- Defining new kinds
     -- KindSignatures,            -- Defining types that consumes kinds other than Type (like Type -> Type)
     -- GADTs                      -- Defining types that fixates a type variable pattern-matching it
     -- TypeFamilies,              -- Alternative to GADTs, defines type equality (= fixating a type variable)
@@ -25,11 +25,17 @@ module Types.Objects.Object.Class where
 import Optics
 
 import Data.Class.Wrap
-import qualified Data.Dict as D
 
 import Types.Objects.Object.Lenses
 
 type Object = Wrap IsObject
 
+-- following *CR 109.3*
+data ObjectType = StackAbility | CardObject | CardCopy | Token |
+    Spell | Permanent | Emblem
+        deriving (Eq, Ord, Enum, Bounded, Show, Read)
+
+-- @todo finish class
 class HasBaseObject a => IsObject a where
-    --toCardObject :: IsCardObject b => a -> b
+    objectType :: a -> ObjectType
+    --toCardObject :: IsCardObject b => a -> Maybe b

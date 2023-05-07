@@ -16,6 +16,9 @@
     - [108. Cards](#108-cards)
     - [109. Objects](#109-objects)
     - [110. Permanents](#110-permanents)
+    - [111. Tokens](#111-tokens)
+    - [112. Spells](#112-spells)
+    - [113. Abilities](#113-abilities)
 
 # Points of Interest
 
@@ -27,6 +30,7 @@
   - [Mana Costs](#poi-mana-costs-definitions----omit-in-toc)
   - [Objects](#poi-objects-definitions----omit-in-toc)
   - [Permanents](#poi-permanents-definitions----omit-in-toc)
+  - [Spells](#poi-spell-definitions----omit-in-toc)
 - Implementation problems
   - [Identifying Mana](#poi-mana-identification-problem----omit-in-toc)
 
@@ -411,7 +415,6 @@
 - **110.2b** :brown_circle: : If an effect causes a player to gain control of another player's permanent spell, the first player controls the permanent that spell becomes, but the permanent's controller by default is the player who put that spell onto the stack. (This distinction is relevant in multiplayer games; see rule 800.4c.)
   1. *NOTE: This is an super edgy case, player A must cast a spell, player B must steal the spell while in the stack, it must resolve to a permanent under B's control, then B must lose while another C player is still in the game, then that permanent returns to A's control*
 
-
 **110.3** :red_circle: : A nontoken permanent's characteristics are the same as those printed on its card, as modified by any continuous effects.
 
 **110.4** :green_circle: : There are five permanent types: artifact, creature, enchantment, land, and planeswalker.
@@ -427,3 +430,117 @@
 - **110.5b** :green_circle: : Permanents enter the battlefield untapped, unflipped, face up, and phased in unless a spell or ability says otherwise.
 - **110.5c** :green_circle: : A permanent retains its status until a spell, ability, or turn-based action changes it, even if that status is not relevant to it.
 - **110.5d** :green_circle: : Only permanents have status. Cards not on the battlefield do not.
+
+### 111. Tokens
+
+**111.1** :green_circle: : A token is a marker used to represent any permanent that isn't represented by a card.
+
+**111.2** :red_circle: : The player who creates a token is its owner. The token enters the battlefield under that player's control.
+
+**111.3** :large_blue_circle: : The effect that creates a token may define the values of any number of characteristics for the token.
+
+**111.4** :red_circle: : A effect that creates a token sets both its name and its subtype(s). If it doesn't specify the name of the token, it enters with its name the same as its subtype(s).
+
+**111.5** :red_circle: : If a effect would create a token, but a rule or effect states that a permanent with one or more of that token's characteristics can't enter the battlefield, the token is not created.
+
+1. *TODO: create verification rule on token creation*
+
+**111.6** :large_blue_circle: : A token is subject to anything that affects permanents in general or that affects the token's card type or subtype. A token isn't a card.
+
+**111.7** :red_circle: : **SBA:** A token that's in a zone other than the battlefield ceases to exist. This is a state-based action.
+
+1. *NOTE: if a token changes zones, applicable triggered abilities will trigger before the token ceases to exist.*
+
+**111.8** :red_circle: : A token that has left the battlefield can't move to another zone or come back onto the battlefield. If such a token would change zones, it remains in its current zone instead. It ceases to exist the next **SBA-check**.
+
+1. *TODO: add "triedChangeZone" flag to tokens, signalizing desctruction*
+
+**111.9** :large_blue_circle: : About named legendary tokens following usual rules.
+
+**111.10** :red_circle: : About predefined tokens.
+
+- **111.10a** :red_circle: : A Treasure token is a colorless Treasure artifact token with "%T, Sacrifice this artifact: Add one mana of any color."
+- **111.10b** :red_circle: : A Food token is a colorless Food artifact token with "%2, %T, Sacrifice this artifact: You gain 3 life."
+- **111.10c** :red_circle: : A Gold token is a colorless Gold artifact token with "Sacrifice this artifact: Add one mana of any color."
+
+### 112. Spells
+
+##### **POI**: SPELL DEFINITIONS <!-- omit in toc -->
+
+**112.1** :green_circle:: A spell is a card on the stack.
+
+- **112.1a** :yellow_circle: : A copy of a spell is also a spell, even if it has no card associated with it.
+- **112.1b** :yellow_circle: : If a player casts a copy of a object, that copy is a spell as well.
+  
+**112.2** :red_circle: : A spell's owner is the same as the owner of the card that represents it, unless it's a copy. In that case, the owner of the spell is the player under whose control it was put on the stack. A spell's controller is, by default, the player who put it on the stack. Every spell has a controller.
+
+**112.3** :red_circle: : A noncopy spell's characteristics are the same as those printed on its card, as modified by any continuous effects.
+
+**112.4** :red_circle: : If an effect changes any characteristics of a permanent spell, the effect continues to apply to the permanent when the spell resolves.
+
+1. *Example: If an effect changes a black creature spell to white, the creature is white when it enters the battlefield and remains white for the duration of the effect changing its color.*
+
+### 113. Abilities
+
+##### **POI**: ABILITIES DEFINITIONS <!-- omit in toc -->
+     
+**113.1** :yellow_circle:: An ability can be one of three things:
+
+- **113.1a** :yellow_circle: : An ability can be a characteristic an object has that lets it affect the game. 
+- **113.1b** :yellow_circle: : An ability can be something that a player has that changes how the game affects the player. 
+- **113.1c** :yellow_circle: : An ability can be an activated or triggered ability on the stack. This kind of ability is an object.
+
+**113.2** :purple_circle: : Abilities can affect the objects they're on. They can also affect other objects and/or players.
+
+- **113.2a** :purple_circle: : Abilities can be beneficial or detrimental.
+- **113.2b** :yellow_circle: : An additional cost or alternative cost to cast a card is an ability of the card.
+- **113.2c** :yellow_circle: : An object may have multiple abilities. If an object has multiple instances of the same ability, each instance functions independently.
+- **113.2d** :yellow_circle: : Abilities can generate one-shot effects or continuous effects. Some continuous effects are replacement effects or prevention effects.
+
+**113.3** :green_circle: : There are four general categories of abilities:
+
+- **113.3a** :yellow_circle: : Spell abilities are instructions of instant or sorcery spells while they are resolving. Any text on an instant or sorcery spell is a spell ability unless it's an activated ability, a triggered ability, or a static ability that fits the criteria described in rule 113.6.
+- **113.3b** :yellow_circle: : Activated abilities have a cost and an effect.
+- **113.3c** :yellow_circle: : Triggered abilities have a trigger condition and an effect.
+- **113.3d** :yellow_circle: : Static abilities are written as statements. Static abilities create continuous effects which are active while the object with the ability is in the appropriate zone.
+
+**113.4** :yellow_circle: : Some activated abilities and some triggered abilities are mana abilities. Mana abilities follow special rules. See rule 605.
+
+**113.5** :yellow_circle: : Some activated abilities are loyalty abilities. Loyalty abilities follow special rules: See rule 606.
+
+**113.6** :red_circle: : Abilities of an instant or sorcery spell usually function only while that object is on the stack. Abilities of all other objects usually function only while that object is on the battlefield. The exceptions are as follows:
+
+- **113.6a** :red_circle: : Characteristic-defining abilities function everywhere, even outside the game.
+- **113.6b** :red_circle: : An ability that states which zones it functions in functions only from those zones.
+- **113.6c** :red_circle: : An object's ability about its alternative cost or its cost's modifications functions on the stack.
+- **113.6d** :red_circle: : An object's ability that modifies how it can be played functions wherever it can be cast from and on the stack. An object's ability that grants it another ability that modifies how it can be played functions only on the stack.
+- **113.6e** :red_circle: : An object's ability that modifies where it can be played from functions everywhere, even outside the game.
+- **113.6f** :red_circle: : An object's ability that states it can't be countered functions on the stack.
+- **113.6g** :red_circle: : An object's ability that modifies how it enters the battlefield functions as it is entering the battlefield.
+- **113.6h** :red_circle: : An object's ability that states counters can't be put on itself functions when it is entering the battlefield and while it is on the battlefield.
+- **113.6i** :red_circle: : An object's activated ability that has a cost that can't be paid while the object is on the battlefield functions from any zone in which its cost can be paid.
+- **113.6j** :red_circle: : A trigger condition that can't trigger from the battlefield functions in all zones it can trigger from. Other trigger conditions of the same triggered ability may function in different zones.
+  1. *Example: Absolver Thrull has the ability "When Absolver Thrull enters the battlefield or the creature it haunts dies, destroy target enchantment." The first trigger condition functions from the battlefield and the second trigger condition functions from the exile zone. (see rule 702.54, "Haunt.")*
+- **113.6k** :red_circle: : An ability whose cost or effect specifies that it moves its object out of a particular zone functions only in that zone, unless it specifies that the object is put beforehand into that zone.
+  1. *Example: Reassembling Skeleton says "%1%B: Return Reassembling Skeleton from your graveyard to the battlefield tapped." A player may activate this ability only if Reassembling Skeleton is in their graveyard.*
+- **113.6m** :brown_circle: : An ability that modifies the rules for deck construction functions before the game begins.
+- **113.6n** :black_circle: : Abilities of emblems, plane cards, vanguard cards, scheme cards, and conspiracy cards function in the command zone.
+
+**113.7** :yellow_circle: : The source of an ability is the object that generated it.
+
+- **113.7a** :red_circle: : Once activated or triggered, an ability exists on the stack independently of its source. Some abilities cause a source to do something rather than the ability doing anything directly. The source can still perform the action even though it no longer exists.
+  
+**113.8** :red_circle: : The controller of an activated ability on the stack is the player who activated it. The controller of a triggered ability on the stack (other than a delayed triggered ability) is the controller/owner of the source when it triggered.
+
+**113.9** :red_circle: : Activated and triggered abilities on the stack aren't spells, and therefore can't be countered by anything that counters only spells. Activated and triggered abilities on the stack can be countered by effects that specifically counter abilities. Static abilities don't use the stack and thus can't be countered at all.
+
+**113.10** :red_circle: : Effects can add or remove abilities of objects.
+
+- **113.10a** :red_circle: : An effect that adds an activated ability may include activation instructions for that ability.
+- **113.10b** :red_circle: : Effects that remove an ability remove all instances of it.
+- **113.10c** :red_circle: : If two or more effects add and remove the same ability, in general the most recent one prevails. See rule 613.
+
+**113.11** :red_circle: : Effects can stop an object from having a specified ability. 
+  
+**113.12** :red_circle: : An effect that sets an object's characteristic, or simply states a quality of that object, is different from an ability granted by an effect. When an object "gains" or "has" an ability, that ability can be removed by another effect. If an effect defines a characteristic of the object ("[permanent] is [characteristic value]"), it's not granting an ability. (see rule 604.3.) Similarly, if an effect states a quality of that object ("[creature] can't be blocked," for example), it's neither granting an ability nor setting a characteristic.
+Example: Muraganda Petroglyphs reads, "Creatures with no abilities get +2/+2." A Runeclaw Bear (a creature with no abilities) enchanted by an Aura that says "Enchanted creature has flying" would not get +2/+2. A Runeclaw Bear enchanted by an Aura that says "Enchanted creature is red" or "Enchanted creature can't be blocked" would get +2/+2.

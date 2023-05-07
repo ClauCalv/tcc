@@ -2,7 +2,7 @@
     DisambiguateRecordFields        -- Not specifying fully qualified name of field
 #-}
 
-module Types.Objects.BaseObject.Test where
+module Types.Objects.Object.Test where
 
 import Optics
 import Types.Objects.Object

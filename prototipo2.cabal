@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0a523bf64cd991e5c802c3756386a970f31ab51c9f892a3d5e91b1fe4b7f5e4d
+-- hash: f9f7544c68d573102a4b73962a5b0e1a7bca9df5893ad9c79ba1ba0a5a0bcca4
 
 name:           prototipo2
 version:        0.1.0.0
@@ -54,6 +54,14 @@ library
       Types.Objects.Object.Lenses
       Types.Objects.Object.Test
       Types.Objects.Permanent
+      Types.Objects.Permanent.Class
+      Types.Objects.Permanent.Entity
+      Types.Objects.Permanent.Lenses
+      Types.Objects.Permanent.Test
+      Types.Objects.Token
+      Types.Objects.Token.Class
+      Types.Objects.Token.Entity
+      Types.Objects.Token.Lenses
       Types.Players
       Types.Players.Player
       Types.Players.Teams
