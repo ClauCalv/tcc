@@ -17,8 +17,8 @@
 #
 # resolver: ./custom-snapshot.yaml
 # resolver: https://example.com/snapshots/2018-01-01.yaml
-resolver:
-  url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/17/9.yaml
+resolver: lts-20.20
+
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -36,8 +36,8 @@ packages:
 # forks / in-progress versions pinned to a git hash. For example:
 #
 extra-deps:
-- fused-effects-1.1.1.0
-- fused-effects-optics-0.2.0.0
+- fused-effects-1.1.2.1
+- fused-effects-optics-0.2.1.0
 # - acme-missiles-0.3
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
@@ -51,7 +51,9 @@ extra-deps:
 # extra-package-dbs: []
 
 # Control whether we use the GHC we find on the path
-# system-ghc: true
+system-ghc: true
+
+allow-different-user: true
 #
 # Require a specific version of stack, using version ranges
 # require-stack-version: -any # Default

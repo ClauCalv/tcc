@@ -1,34 +1,14 @@
-module Types.Objects.Permanent where
+module Types.Objects.Permanent (
+    Entity.PermanentStatus(PermanentStatus),
+    Entity.TapStatus(..),
+    Entity.FlipStatus(..),
+    Entity.FaceStatus(..),
+    Entity.PhaseStatus(..),
 
-import Data.Class.Cycle
+    module Class,
+    module Lenses
+) where
 
-import Types.Objects.BaseObject
-
-data Permanent = Permanent {
-    baseObject :: BaseObject,
-    permanentStatus :: PermanentStatus
-}
-
-data PermanentStatus = PermanentStatus {
-    tapStatus :: TapStatus,
-    flipStatus :: FlipStatus,
-    faceStatus :: FaceStatus,
-    phaseStatus :: PhaseStatus
-} deriving (Eq, Show, Read)
-
-data TapStatus =  Untapped | Tapped
-    deriving (Eq, Ord, Enum, Bounded, Show, Read)
-data FlipStatus = Unflipped | Flipped
-    deriving (Eq, Ord, Enum, Bounded, Show, Read)
-data FaceStatus =  FaceUp | FaceDown
-    deriving (Eq, Ord, Enum, Bounded, Show, Read)
-data PhaseStatus = PhasedIn | PhasedOut
-    deriving (Eq, Ord, Enum, Bounded, Show, Read)
-
-instance Cycle TapStatus
-instance Cycle FlipStatus
-instance Cycle FaceStatus
-instance Cycle PhaseStatus
-
-defaultPermanentStatus :: PermanentStatus
-defaultPermanentStatus = PermanentStatus Untapped Unflipped FaceUp PhasedIn
+import Types.Objects.Permanent.Class as Class
+import Types.Objects.Permanent.Entity as Entity
+import Types.Objects.Permanent.Lenses as Lenses

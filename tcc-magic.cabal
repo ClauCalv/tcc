@@ -1,13 +1,11 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.35.1.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 0a523bf64cd991e5c802c3756386a970f31ab51c9f892a3d5e91b1fe4b7f5e4d
 
-name:           prototipo2
-version:        0.1.0.0
+name:           tcc-magic
+version:        0.4.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/prototipo2#readme>
 homepage:       https://github.com/githubuser/prototipo2#readme
 bug-reports:    https://github.com/githubuser/prototipo2/issues
@@ -54,6 +52,14 @@ library
       Types.Objects.Object.Lenses
       Types.Objects.Object.Test
       Types.Objects.Permanent
+      Types.Objects.Permanent.Class
+      Types.Objects.Permanent.Entity
+      Types.Objects.Permanent.Lenses
+      Types.Objects.Permanent.Test
+      Types.Objects.Token
+      Types.Objects.Token.Class
+      Types.Objects.Token.Entity
+      Types.Objects.Token.Lenses
       Types.Players
       Types.Players.Player
       Types.Players.Teams
@@ -63,7 +69,7 @@ library
       Utils.MaybeEither
       Utils.THUtils
   other-modules:
-      Paths_prototipo2
+      Paths_tcc_magic
   hs-source-dirs:
       src
   build-depends:
@@ -82,10 +88,10 @@ library
     , text
   default-language: Haskell2010
 
-executable prototipo2-exe
+executable tcc-magic-exe
   main-is: Main.hs
   other-modules:
-      Paths_prototipo2
+      Paths_tcc_magic
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -101,16 +107,16 @@ executable prototipo2-exe
     , operational
     , optics
     , optics-th
-    , prototipo2
+    , tcc-magic
     , template-haskell
     , text
   default-language: Haskell2010
 
-test-suite prototipo2-test
+test-suite tcc-magic-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_prototipo2
+      Paths_tcc_magic
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -126,7 +132,7 @@ test-suite prototipo2-test
     , operational
     , optics
     , optics-th
-    , prototipo2
+    , tcc-magic
     , template-haskell
     , text
   default-language: Haskell2010

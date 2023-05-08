@@ -21,7 +21,9 @@
 
 module MagicGame where
 
+import Control.Monad
 import Control.Algebra
+import Control.Carrier.State.Strict
 import Effects.Server
 
 import qualified Data.Dict as D
