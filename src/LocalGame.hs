@@ -37,8 +37,9 @@ import Control.Effect.Optics
 import Effects.Server.LocalServer
 import Effects.IOFormatter
 
-import MagicGame
 import Types.MagicGameTypes
+
+{--
 
 data LocalServerConfig = LocalServerConfig 
     { _nOfPlayers  :: Maybe Int
@@ -76,3 +77,5 @@ startLocalGame =  runIOFormatter @String $
                         liftIO . putStrLn $ "Local Server On"
                         config <- serverConfigLoop
                         startGame config
+
+--}

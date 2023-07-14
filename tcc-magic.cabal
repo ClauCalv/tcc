@@ -25,26 +25,46 @@ source-repository head
 
 library
   exposed-modules:
+      Data.AssocDict
       Data.Class.Cycle
       Data.Class.Wrap
       Data.Dict
       Data.EnumMultiSet
+      Data.Serializable
       Effects.IOFormatter
       Effects.Server
       Effects.Server.LocalServer
       Effects.Server.RemoteServer
-      IOUtils
+      Effects.Test
       LocalGame
-      MagicGame
+      Magic.Cards.BasicCards
+      Magic.Data.AssocDict
+      Magic.Data.Dict
+      Magic.Engine.Engine
+      Magic.Engine.MagicGame
+      Magic.Engine.Types.Ability
+      Magic.Engine.Types.CardType
+      Magic.Engine.Types.Color
+      Magic.Engine.Types.Effect
+      Magic.Engine.Types.Effect.GainManaEffect
+      Magic.Engine.Types.Effect.MoveObjectEffect
+      Magic.Engine.Types.Effect.TapObjectEffect
+      Magic.Engine.Types.Mana
+      Magic.Engine.Types.Object
+      Magic.Engine.Types.Player
+      Magic.Engine.Types.TurnPhase
+      Magic.Engine.Types.World
+      Magic.Engine.Types.Zone
+      Magic.Server.ServerCommunicator
+      Magic.Server.ServerCommunicator.ConsoleServerCommunicator
+      Magic.Server.ServerCommunicator.TCPServerCommunicator
+      Magic.Server.ServerInterpreter
+      Magic.Server.ServerInterpreter.DefaultServerInterpreter
       RemoteGame
-      Types.Cards
+      Test
       Types.Cards.Card
       Types.Cards.CardTypes
-      Types.Colors
-      Types.Costs.ManaCosts
-      Types.EntityTypes
       Types.MagicGameTypes
-      Types.Mana
       Types.Objects.CardObject
       Types.Objects.Object
       Types.Objects.Object.Class
@@ -60,12 +80,11 @@ library
       Types.Objects.Token.Class
       Types.Objects.Token.Entity
       Types.Objects.Token.Lenses
-      Types.Players
-      Types.Players.Player
       Types.Players.Teams
       Types.World
       Types.Zones
       Types.Zones.Zone
+      Utils.IOUtils
       Utils.MaybeEither
       Utils.THUtils
   other-modules:
@@ -76,6 +95,7 @@ library
       base >=4.7 && <5
     , containers
     , enummapset
+    , extra
     , fused-effects ==1.1.*
     , fused-effects-optics
     , ilist
@@ -94,11 +114,12 @@ executable tcc-magic-exe
       Paths_tcc_magic
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -dth-dec-file
   build-depends:
       base >=4.7 && <5
     , containers
     , enummapset
+    , extra
     , fused-effects ==1.1.*
     , fused-effects-optics
     , ilist
@@ -119,11 +140,12 @@ test-suite tcc-magic-test
       Paths_tcc_magic
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N -dth-dec-file
   build-depends:
       base >=4.7 && <5
     , containers
     , enummapset
+    , extra
     , fused-effects ==1.1.*
     , fused-effects-optics
     , ilist

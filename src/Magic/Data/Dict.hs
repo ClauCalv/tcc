@@ -21,6 +21,8 @@
 
 module Data.Dict where
 import Data.Maybe (isJust, fromJust)
+import Optics (Index, IxValue, Ixed(..), An_AffineTraversal, AffineTraversal', atraversal)
+import Data.Either.Extra (maybeToEither)
 
 class UniqDict d where
     type RefOf d
@@ -39,8 +41,16 @@ class UniqDict d where
     putAll [] d = d
     putAll (a:as) d = putAll as . snd . put a $ d
 
+type instance Index (AssocDict k v) = k
+type instance IxValue (AssocDict k v) = v
+instance Ixed (AssocDict k v) where
+    type IxKind (AssocDict k v) = An_AffineTraversal
+    ix :: k -> AffineTraversal' (AssocDict k v) v
+    ix k = atraversal (\l -> maybeToEither l $ find k l) (\l v -> modify (const v) k l)
+
 type AssocList k v = [(k, v)]
-data AssocDict k v where AssocDict :: (Eq k, Enum k) => k -> AssocList k v -> AssocDict k v
+data AssocDict k v where 
+    AssocDict :: (Eq k, Enum k) => k -> AssocList k v -> AssocDict k v
 
 empty :: (Eq k, Enum k, Bounded k) => AssocDict k v
 empty = emptyWith minBound

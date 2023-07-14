@@ -32,3 +32,5 @@
 :def hlint const . return $ ":! hlint \"src\""
 :def hoogle \s -> return $ ":! hoogle --count=15 \"" ++ s ++ "\""
 :def package \ m -> return $ ":! ghc-pkg --simple-output find-module " ++ m
+
+:set -dth-dec-file

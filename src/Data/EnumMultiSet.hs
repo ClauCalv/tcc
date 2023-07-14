@@ -4,7 +4,7 @@
     -- RankNTypes,                -- Advanced types
 
     -- KindSignatures,            -- Defining types that consumes kinds other than Type (like Type -> Type)
-    GADTs                         -- Defining types that fixates a type variable pattern-matching it
+    GADTs,                         -- Defining types that fixates a type variable pattern-matching it
     -- TypeFamilies,              -- Alternative to GADTs, defines type equality (= fixating a type variable)
 
     --MultiParamTypeClasses,        -- Defining complex classes (like Algebra)
@@ -16,12 +16,13 @@
 
     -- TypeApplications,          -- Defining type in expression via @
     -- OverloadedStrings,         -- Treating string literals via IsString instead of defaulting to [Char]
-    --GeneralizedNewtypeDeriving    -- Code shortening, unnecessary but useful.
+    GeneralizedNewtypeDeriving    -- Code shortening, unnecessary but useful.
 #-}
 
 module Data.EnumMultiSet where
 
 import Prelude hiding (map)
+--import Control.DeepSeq
 
 import qualified Data.List as L
 
@@ -35,6 +36,7 @@ import qualified Data.MultiSet as MS
 import qualified Data.IntMultiSet as IMS
 
 newtype EnumMultiSet a = EMS { unEMS :: IMS.IntMultiSet }
+  deriving (Semigroup, Monoid) -- ,NFData)
 
 
 -- Conversion to/from 'IntMultiSet'.
