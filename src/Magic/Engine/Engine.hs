@@ -12,12 +12,12 @@ import Magic.Engine.Types.Player
 import Utils.MaybeEither (loopEither)
 import Magic.Server.ServerCommunicator (ServerPlayerRef)
 
-import Data.Maybe (Maybe(Just, Nothing), catMaybes)
+import Data.Maybe (Maybe(Just, Nothing), catMaybes, fromJust)
 import Control.Monad (forM_)
 import Magic.Server.ServerInterpreter (Question(AskYesNo))
 import Data.Either (Either(Right))
 import Magic.Engine.Types.Object (Card)
-import Magic.Engine.Types.Zone (initializeZones)
+import Magic.Engine.Types.Zone (initializeZones, atZone, ZoneRef (Library), objects)
 
 import Optics hiding (modifying, modifying', assign, assign', use, preuse)
 import Control.Effect.Optics
@@ -52,7 +52,8 @@ initDecks = do
     mapM_ initDeck (D.keys ps)
     where
         initDeck p = do
-            cards <- use playersCards %
+            cards <- preuse $ playersCards % ix p
+            modifying (zones % atZone (Library p) % objects) $ D.putAll (map ($ p) (fromJust cards))
             
 
 

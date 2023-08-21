@@ -28,7 +28,7 @@ instance Effect TapObjectEffect where
     }
     runEffect (TapObjectEffect objZoneRef) = do
         assign (zones % ixZoneObj objZoneRef % permanent % permanentStatus % tapStatus) Tapped
-        return $ PermanentTapped objZoneRef
+        return $ PermanentTappedEvent objZoneRef
 
 tapSelfEffect :: EffectActivation
 tapSelfEffect actCtx = return [MkWrap . TapObjectEffect . fromJust $ actCtx ^. source]
