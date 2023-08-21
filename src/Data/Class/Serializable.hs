@@ -1,4 +1,4 @@
-module Data.Serializable where
+module Data.Class.Serializable where
 
 class Serializable b a where
     serialize :: a -> b

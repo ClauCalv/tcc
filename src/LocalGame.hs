@@ -37,8 +37,6 @@ import Control.Effect.Optics
 import Effects.Server.LocalServer
 import Effects.IOFormatter
 
-import Types.MagicGameTypes
-
 {--
 
 data LocalServerConfig = LocalServerConfig 

@@ -1,18 +1,28 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Magic.Engine.Types.Ability where
 
-import Magic.Server.ServerInterpreter
+import {-# SOURCE #-} Magic.Engine.MagicGame.Contextual
+
+import {-# SOURCE #-} Magic.Engine.Types.World
 import Magic.Engine.Types.Player
-import Magic.Engine.Types.Effect
+import {-# SOURCE #-} Magic.Engine.Types.Effect
+import Magic.Engine.Types.Mana
+import Magic.Engine.Types.Zone
+
 import qualified Data.EnumSet as ES
 import qualified Data.EnumMultiSet as EMS
-import Magic.Engine.Types.Mana (ManaCost)
+import Data.Class.Wrap
+
+import Optics
+
 
 data AbilityType = SpellAbility | ActivatedAbility | TriggeredAbility | StaticAbility 
     | ManaAbility | LoyaltyAbility | KeywordAbility | EvasionAbility | CharacteristicDefiningAbility
     | IntrinsicAbility | DraftAbility
+    deriving (Eq, Ord, Enum, Bounded)
 
-type AbilityTypeSet = ES.EnumSet abilityType
-type EffectActivation = ActivationContext -> Contextual [Effect]
+type AbilityTypeSet = ES.EnumSet AbilityType
+type EffectActivation = ActivationContext -> Contextual [Wrap Effect]
 
 data Ability = MkAbility {
     _abilityTypes :: AbilityTypeSet,
@@ -21,8 +31,8 @@ data Ability = MkAbility {
 
 data ActivationContext = MkActivationContext {
     _activator :: Maybe PlayerRef,
-    _source :: Maybe (Some ObjectZoneRef),
-    _world :: World
+    _source :: Maybe SomeObjectZoneRef,
+    _world :: MagicWorld
 }
 
 data Timing = LandTime | SorcTime | InstTime | ManaTime
@@ -46,19 +56,19 @@ makeLenses ''Costs
 
 emptyAbility :: Ability
 emptyAbility = MkAbility {
-    abilityTypes = ES.empty,
-    activation = emptyActivation
+    _abilityTypes = ES.empty,
+    _activation = emptyActivation
 }
 
 emptyActivation :: Activation
 emptyActivation = MkActivation {
-    prereq = [],
-    costs = emptyCosts,
-    effects = const $ return []
+    _prereq = [],
+    _costs = emptyCosts,
+    _effects = const $ return []
 }
 
 emptyCosts :: Costs
 emptyCosts = MkCosts {
-    manaCost = EMS.empty,
-    otherCosts = Nothing
+    _manaCost = EMS.empty,
+    _otherCosts = Nothing
 }

@@ -21,27 +21,25 @@
 
 module Magic.Server.ServerCommunicator.TCPServerCommunicator where
 
--- from base
---import Control.Applicative
---import Data.Kind (Type)
--- from fused-effects
+
 import Control.Algebra
--- from transformers
+import Control.Carrier.Lift (runM)
+import Control.Carrier.State.Strict (StateC, gets, State, modify, evalState)
+
+import Control.Monad (forever)
 import Control.Monad.IO.Class
 
---import Data.Serializable
-import qualified Data.Dict as D
-import Control.Carrier.State.Strict (StateC, gets, State, modify, evalState)
 import Data.Maybe (fromJust)
 import Text.Read (readMaybe)
+
+import Data.IORef (IORef, writeIORef, newIORef, readIORef)
+import Control.Concurrent (MVar, putMVar, takeMVar, newEmptyMVar, forkIO)
 import System.Exit (die)
 
+import qualified Magic.Data.Dict as D
+
 import Magic.Server.ServerCommunicator
-import Control.Carrier.Lift (runM)
-import Control.Concurrent (MVar, putMVar, takeMVar, newEmptyMVar, forkIO)
-import Data.Dict (UniqDict(keys))
-import Control.Monad (forever)
-import Data.IORef (IORef, writeIORef, newIORef, readIORef)
+
 
 data TCPServerConfig = TCPServerConfig {
     _players :: D.AssocDict ServerPlayerRef TCPServerPlayer,
@@ -70,7 +68,7 @@ doCommunicate :: TCPServerCommunicatorConstraint sig m => ServerCommunication a 
 doCommunicate (BroadcastMessage t) = do
     output <- gets _output
     players <- gets _players
-    liftIO . mapM_ (\k -> putMVar output (k, t)) . keys $ players
+    liftIO . mapM_ (\k -> putMVar output (k, t)) . D.keys $ players
 doCommunicate (SendMessage p t) = do
     output <- gets _output
     liftIO . putMVar output $ (p, t)

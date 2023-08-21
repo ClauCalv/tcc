@@ -22,7 +22,9 @@
     -- TypeApplications,          -- Defining type in expression via @
     -- OverloadedStrings,         -- Treating string literals via IsString instead of defaulting to [Char]
     -- GeneralizedNewtypeDeriving -- Code shortening, unnecessary but useful.
-    DeriveAnyClass
+    DeriveAnyClass,
+    TemplateHaskell,
+    TypeFamilyDependencies
 #-}
 
 {-# OPTIONS_GHC -dth-dec-file #-}
@@ -31,32 +33,36 @@ module Magic.Engine.Types.Object where
 
 import Magic.Engine.Types.Player
 import Magic.Engine.Types.CardType
-import Magic.Engine.Types.Ability
+import Magic.Engine.Types.Color
+import {-# SOURCE #-} Magic.Engine.Types.Ability
 
 import Optics (makeLenses)
 
+type Card = PlayerRef -> Object
 
 -- DATAKIND
 data ObjectType = CardObjTp | PermanentObjTp | StackItemObjTp
 
-type CardObject = ObjectOfType CardObjTp
-type PermanentObject = ObjectOfType PermanentObjTp
-type StackObject = ObjectOfType StackItemObjTp
+type family ObjectOfType (a :: ObjectType) = x | x -> a where
+    ObjectOfType CardObjTp = CardObject
+    ObjectOfType PermanentObjTp = PermanentObject
+    ObjectOfType StackItemObjTp = StackObject
 
-data ObjectOfType (a :: ObjectType) where
-    MkCardObject :: {
-        cardObject :: Object
-    } -> CardObject
-    MkPermanentObject :: {
-        originalCardObject :: Maybe Object,
-        permanentObject :: Permanent
-    } -> PermanentObject
-    MkStackItemObject :: {
-        originalCardObject :: Maybe Object,
-        stackObject :: StackItem
-    } -> StackObject
+data CardObject = MkCardObject {
+    _baseCardObj :: Object
+}
 
-makeLenses ''ObjectOfType
+data PermanentObject = MkPermanentObject {
+    _basePermObj :: Object,
+    _originalPermObj :: Object,
+    _permanent :: Permanent
+}
+
+data StackObject = MkStackObject {
+    _baseStackObj :: Object,
+    _originalStackObj :: Object,
+    _stackItem :: StackItem
+}
 
 type PowerToughness = (Integer, Integer)
 
@@ -71,12 +77,10 @@ data Object = MkObject {
     _activatedAbilities :: [Ability]
 }
 data Permanent = MkPermanent {
-    _baseObjAttr :: Object,
     _permanentStatus :: PermanentStatus,
     _damage :: Integer
 }
 data StackItem = MkStackItem {
-    _baseObjAttr :: Object,
     _stackAttr :: ()
 }
 
@@ -88,23 +92,25 @@ data PermanentStatus = PermanentStatus {
 } deriving (Eq, Show, Read)
 
 data TapStatus =  Untapped | Tapped
-    deriving (Eq, Ord, Enum, Bounded, Show, Read, Cycle)
+    deriving (Eq, Ord, Enum, Bounded, Show, Read) --, Cycle)
 data FlipStatus = Unflipped | Flipped
-    deriving (Eq, Ord, Enum, Bounded, Show, Read, Cycle)
+    deriving (Eq, Ord, Enum, Bounded, Show, Read) --, Cycle)
 data FaceStatus =  FaceUp | FaceDown
-    deriving (Eq, Ord, Enum, Bounded, Show, Read, Cycle)
+    deriving (Eq, Ord, Enum, Bounded, Show, Read) --, Cycle)
 data PhaseStatus = PhasedIn | PhasedOut
-    deriving (Eq, Ord, Enum, Bounded, Show, Read, Cycle)
+    deriving (Eq, Ord, Enum, Bounded, Show, Read) --, Cycle)
 
 defaultPermanentStatus :: PermanentStatus
 defaultPermanentStatus = PermanentStatus Untapped Unflipped FaceUp PhasedIn
+
+makeLenses ''CardObject
+makeLenses ''PermanentObject
+makeLenses ''StackObject
 
 makeLenses ''Object
 makeLenses ''Permanent
 makeLenses ''StackItem
 makeLenses ''PermanentStatus
-
-type Card = PlayerRef -> Object
 
 emptyCard :: Card
 emptyCard p = MkObject {
@@ -112,8 +118,8 @@ emptyCard p = MkObject {
     _owner = Just p,
     _controller = Just p,
     _types = emptyCTS,
-    _colors = ES.empty,
+    _colors = colorlessCS,
     _powerToughness = (0,0),
-    _playAbility = emptyActivation,
+    _playAbility = Nothing,
     _activatedAbilities = []
 }

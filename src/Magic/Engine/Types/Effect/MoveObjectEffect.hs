@@ -1,14 +1,18 @@
-module Magic.Engine.Effect.MoveObjectEffect where
+{-# LANGUAGE DuplicateRecordFields, TypeFamilies #-}
+module Magic.Engine.Types.Effect.MoveObjectEffect where
 
+import Magic.Engine.Types.Effect
+import Magic.Engine.Types.Ability
+import Magic.Engine.Types.World
 import Magic.Engine.Types.Zone
+
 import Magic.Engine.Types.Object
-import Control.Carrier.State.Church (State, modify)
-import Control.Monad (when)
-import Data.Maybe (isJust)
-import Types.World (World(_zones))
-import qualified Data.Dict as D
-import Control.Effect.Optics (assign)
-import Optics (At(at))
+
+import Control.Effect.Optics
+import Optics hiding (modifying, modifying', assign, assign', use, preuse) -- Hide Optics.State entirely!
+
+import qualified Magic.Data.Dict as D
+import Data.Maybe (fromJust)
 
 data MoveObjectEffect old new = MoveObjectEffect {
     oldObjRef :: Maybe (ObjectZoneRef old),
@@ -25,12 +29,12 @@ instance Effect (MoveObjectEffect old new) where
         case oldRef of
             Just (MkObjectZoneRef oldZoneRef oldObjRef) -> do
                 --Remove object from where it was
-                oldZone <- use zones % ix oldZoneRef
-                let (_, oldZone') = D.remove oldObjRef
-                assign (zones % ix oldZoneRef) oldZone'
+                oldZone <- preuse $ zones % atZone oldZoneRef % objects
+                let (_, oldZone') = D.remove oldObjRef (fromJust oldZone)
+                assign (zones % atZone oldZoneRef % objects) oldZone'
             Nothing -> return ()
         -- insert new object into new zone
-        newZone <- use zones % ix newZoneRef
-        let (newObjRef, newZone') = D.put newObj newZone
-        assign (zones % ix newZoneRef) newObjRef
+        newZone <- preuse $ zones % atZone newZoneRef % objects
+        let (newObjRef, newZone') = D.put newObj (fromJust newZone)
+        assign (zones % atZone newZoneRef % objects) newZone'
         return $ ObjectDidMove oldRef (MkObjectZoneRef newZoneRef newObjRef)

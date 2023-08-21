@@ -1,23 +1,26 @@
+{-# LANGUAGE TypeFamilies #-}
+
 module Magic.Engine.Types.Effect where
 
-import Control.Carrier.State.Church (State, modify)
-import Control.Monad (when)
-import Data.Maybe (isJust)
-import Types.World (World(_zones))
-import qualified Data.Dict as D
-import Control.Effect.Optics (assign)
-import Optics (At(at))
+import {-# SOURCE #-} Magic.Engine.Types.World
+import {-# SOURCE #-} Magic.Engine.Types.Event
+import Magic.Engine.MagicGame
+
+import Control.Algebra
+import Control.Effect.State
+import Optics
+import Data.Class.Wrap (Wrap)
+
 
 class Effect e where
-    data EventHistory e
-    runEffect :: (Has (State MagicWorld) sig m, Has MagicGame sig m) => e -> m (EventHistory e)
+    runEffect :: (Has (State MagicWorld) sig m, Has MagicGame sig m, Event ev) => e -> m ev
 
+instance Effect e => Wrap Effect where
+    runEffect (MkWrap e) = runEffect e
 
+{-
 data Effect = 
-    GainMana {
-        targetPlayer :: PlayerRef,
-        manaGainAmount :: ManaTotal
-    } | DealDamage {
+    DealDamage {
         damageSource :: Object,
         damageTarget :: Either PlayerRef (ObjectZoneRef PermanentObjTp),
         damageAmount :: Integer
@@ -34,3 +37,4 @@ data Effect =
         objectToMove :: Maybe (ObjectZoneRef old),
         targetMoveZone :: ZoneRef new
     }
+-}

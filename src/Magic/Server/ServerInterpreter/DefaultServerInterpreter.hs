@@ -25,11 +25,14 @@ import Control.Algebra
 
 import Magic.Server.ServerCommunicator
 import Magic.Server.ServerInterpreter
+
 import Control.Monad (when, forM_)
+
+import Text.Read (readMaybe)
 import Data.Maybe (isJust, fromJust, isNothing)
 import Utils.MaybeEither (loopEither, mapLeft)
-import Text.Read (readMaybe)
-import Data.Serializable (Serializable (serialize))
+
+import Data.Class.Serializable (Serializable (serialize))
 
 newtype DefaultServerInterpreter m a = DefaultServerInterpreter { runDefaultServerInterpreter :: m a }
     deriving (Applicative, Functor, Monad)

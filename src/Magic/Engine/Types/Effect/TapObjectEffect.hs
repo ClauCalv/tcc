@@ -1,18 +1,25 @@
+{-# LANGUAGE DuplicateRecordFields, DataKinds, TypeFamilies #-}
 module Magic.Engine.Types.Effect.TapObjectEffect where
 
+import Magic.Engine.Types.Effect
+import Magic.Engine.Types.Ability
+import Magic.Engine.Types.World
 import Magic.Engine.Types.Zone
 import Magic.Engine.Types.Object
-import Control.Carrier.State.Church (State, modify)
-import Control.Monad (when)
-import Data.Maybe (isJust)
-import Types.World (World(_zones))
-import qualified Data.Dict as D
-import Control.Effect.Optics (assign)
-import Optics (At(at))
-import Data.Bool (Bool(True))
+
+import Control.Effect.Optics
+import Optics hiding (modifying, modifying', assign, assign', use, preuse) -- Hide Optics.State entirely!
+
+import qualified Magic.Data.Dict as D
+import Data.Maybe (fromJust)
+import Magic.Engine.Types.Zone (ZoneRef(ixZoneObj))
 
 data TapObjectEffect = TapObjectEffect {
-    targetObjRef :: ObjectZoneRef PermanentObjTp
+    _targetObjRef :: ObjectZoneRef BattlefieldZRef
+}
+
+data PermanentTappedEvent = PermanentTappedEvent {
+    _targetObjRef :: ObjectZoneRef BattlefieldZRef
 }
 
 instance Effect TapObjectEffect where
@@ -20,8 +27,8 @@ instance Effect TapObjectEffect where
         targetObjRef :: ObjectZoneRef PermanentObjTp
     }
     runEffect (TapObjectEffect objZoneRef) = do
-        assign (zones % ix (objZoneRef ^. zoneRef) % ix (objZoneRef ^. objRef) % permanentObject % tapStatus) Tapped
+        assign (zones % ixZoneObj objZoneRef % permanent % permanentStatus % tapStatus) Tapped
         return $ PermanentTapped objZoneRef
 
 tapSelfEffect :: EffectActivation
-tapSelfEffect actCtx = return [TapObjectEffect . fromJust $ actCtx ^. source]
+tapSelfEffect actCtx = return [MkWrap . TapObjectEffect . fromJust $ actCtx ^. source]

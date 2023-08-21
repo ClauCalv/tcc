@@ -25,23 +25,20 @@ source-repository head
 
 library
   exposed-modules:
-      Data.AssocDict
       Data.Class.Cycle
+      Data.Class.Serializable
       Data.Class.Wrap
-      Data.Dict
       Data.EnumMultiSet
-      Data.Serializable
-      Effects.IOFormatter
-      Effects.Server
-      Effects.Server.LocalServer
-      Effects.Server.RemoteServer
       Effects.Test
       LocalGame
       Magic.Cards.BasicCards
-      Magic.Data.AssocDict
-      Magic.Data.Dict
+      Magic.Data.AutoIndexedSet
+      Magic.Data.Empty
+      Magic.Data.IndexedDeque
+      Magic.Data.IndexedSet
       Magic.Engine.Engine
       Magic.Engine.MagicGame
+      Magic.Engine.MagicGame.Contextual
       Magic.Engine.Types.Ability
       Magic.Engine.Types.CardType
       Magic.Engine.Types.Color
@@ -49,6 +46,7 @@ library
       Magic.Engine.Types.Effect.GainManaEffect
       Magic.Engine.Types.Effect.MoveObjectEffect
       Magic.Engine.Types.Effect.TapObjectEffect
+      Magic.Engine.Types.Event
       Magic.Engine.Types.Mana
       Magic.Engine.Types.Object
       Magic.Engine.Types.Player
@@ -62,28 +60,6 @@ library
       Magic.Server.ServerInterpreter.DefaultServerInterpreter
       RemoteGame
       Test
-      Types.Cards.Card
-      Types.Cards.CardTypes
-      Types.MagicGameTypes
-      Types.Objects.CardObject
-      Types.Objects.Object
-      Types.Objects.Object.Class
-      Types.Objects.Object.Entity
-      Types.Objects.Object.Lenses
-      Types.Objects.Object.Test
-      Types.Objects.Permanent
-      Types.Objects.Permanent.Class
-      Types.Objects.Permanent.Entity
-      Types.Objects.Permanent.Lenses
-      Types.Objects.Permanent.Test
-      Types.Objects.Token
-      Types.Objects.Token.Class
-      Types.Objects.Token.Entity
-      Types.Objects.Token.Lenses
-      Types.Players.Teams
-      Types.World
-      Types.Zones
-      Types.Zones.Zone
       Utils.IOUtils
       Utils.MaybeEither
       Utils.THUtils
@@ -104,6 +80,7 @@ library
     , operational
     , optics
     , optics-th
+    , random
     , template-haskell
     , text
   default-language: Haskell2010
@@ -128,6 +105,7 @@ executable tcc-magic-exe
     , operational
     , optics
     , optics-th
+    , random
     , tcc-magic
     , template-haskell
     , text
@@ -154,6 +132,7 @@ test-suite tcc-magic-test
     , operational
     , optics
     , optics-th
+    , random
     , tcc-magic
     , template-haskell
     , text

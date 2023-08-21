@@ -1,16 +1,19 @@
+{-# LANGUAGE TemplateHaskell #-}
 module Magic.Engine.Types.World where
 
 import Magic.Engine.Types.Player
 import Magic.Engine.Types.Zone
 import Magic.Engine.Types.Object
 
-import qualified Data.Dict as D
+import qualified Magic.Data.Dict as D
 import Optics (makeLenses)
+
+type Event = String
 
 data Timestamp = Timestamp {
     _turn :: Integer,
     _count :: Integer
-}
+} deriving (Eq, Ord)
 
 data MagicWorld = MagicWorld {
     _zones :: Zones,
@@ -18,7 +21,7 @@ data MagicWorld = MagicWorld {
     _priorityOrder :: [Player],
     
     _currTime :: Timestamp,
-    _history :: D.AssocDict Timestamp [Event]
+    _history :: D.AssocList Timestamp [Event]
 }
 
 makeLenses ''Timestamp
@@ -31,5 +34,5 @@ emptyWorld = MagicWorld {
     _priorityOrder = [],
     
     _currTime = Timestamp 0 0,
-    _history = D.empty
+    _history = []
 }

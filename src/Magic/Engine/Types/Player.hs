@@ -8,8 +8,8 @@ import qualified Data.EnumMultiSet as EMS
 type PlayerRef = Int
 
 data Player = MkPlayer {
-    life :: Integer,
-    manaPool :: ManaPool
+    _life :: Integer,
+    _manaPool :: ManaPool
     -- counter :: EnumMultiSet Counter
 }
 

@@ -21,23 +21,20 @@
 
 module Magic.Server.ServerCommunicator.ConsoleServerCommunicator where
 
--- from base
---import Control.Applicative
---import Data.Kind (Type)
--- from fused-effects
-import Control.Algebra
--- from transformers
-import Control.Monad.IO.Class
 
---import Data.Serializable
-import qualified Data.Dict as D
+import Control.Algebra
 import Control.Carrier.State.Strict (StateC, gets, State, modify, evalState)
-import Data.Maybe (fromJust)
-import Text.Read (readMaybe)
+import Control.Carrier.Lift (runM)
+
+import Control.Monad.IO.Class
 import System.Exit (die)
 
+import Data.Maybe (fromJust)
+import Text.Read (readMaybe)
+
+import qualified Magic.Data.Dict as D
+
 import Magic.Server.ServerCommunicator
-import Control.Carrier.Lift (runM)
 
 data ConsoleServerConfig = ConsoleServerConfig {
     _players :: D.AssocDict ServerPlayerRef ConsoleServerPlayer,

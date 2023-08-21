@@ -249,7 +249,8 @@ instance Show Object where
       Nothing -> "(anonymous)"
       Just n  -> unpack n
 
-data ObjectOfType :: ObjectType -> * where
+--data ObjectOfType :: ObjectType -> * where
+data ObjectOfType (x :: ObjectType) where
   CardObject :: { _cardObject :: Object
                 } -> ObjectOfType TyCard
   Permanent  :: { _permanentObject :: Object

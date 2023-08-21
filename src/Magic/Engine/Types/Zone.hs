@@ -1,74 +1,157 @@
+{-# LANGUAGE TemplateHaskell, DataKinds, TypeFamilyDependencies #-}
+
 module Magic.Engine.Types.Zone where
 
+
+import Optics
+import Optics.Indexed
+
 import Magic.Engine.Types.Object
-import qualified Data.Dict as D
-import Optics.Indexed (IxLens')
-import Optics (makeLenses)
+import Magic.Engine.Types.Player
 
-data Zones = Zones {
-    _library :: D.AssocDict PlayerRef (Zone CardObject) ,
-    _hand :: D.AssocDict (Zone CardObject) ,
-    _graveyard :: D.AssocDict (Zone CardObject) ,
-    _exile :: Zone CardObject,
-    _battlefield :: Zone PermanentObject,
-    _stack :: Zone StackObject
-}
+import Utils.MaybeEither (maybeToEither)
+import Data.Maybe (fromJust)
 
-data Zone (a :: ObjectType) = Zone {
-    _zoneOwner :: Maybe PlayerRef,
-    _objects :: D.AssocDict ObjectRef a
-}
+import qualified Magic.Data.IndexedSet as IS
+import qualified Magic.Data.AutoIndexedSet as AIS
+import qualified Magic.Data.IndexedDeque as ID
 
-makeLenses ''Zone
-makeLenses ''Zones
-
-emptyZones :: Zones
-emptyZones = Zones {
-    library = D.empty,
-    hand = D.empty,
-    graveyard = D.empty,
-    exile = Zone Nothing D.empty,
-    battlefield = Zone Nothing D.empty,
-    stack = Zone Nothing D.empty
-}
+import Magic.Data.Empty
+import Data.Data (Proxy(Proxy))
 
 type ObjectRef = Int
-data ZoneRef (a :: ObjectType) where
-  Library     :: PlayerRef -> ZoneRef CardObjTp
-  Hand        :: PlayerRef -> ZoneRef CardObjTp
-  Graveyard   :: PlayerRef -> ZoneRef CardObjTp
-  Exile       ::              ZoneRef CardObjTp
-  Battlefield ::              ZoneRef PermanentObjTp
-  Stack       ::              ZoneRef StackItemObjTp
 
-data ObjectZoneRef a = ObjectZoneRef {
-    zoneRef :: ZoneRef a,
-    objRef :: ObjectRef
+data Zones = MkZones {
+    _library :: IS.IndexedSet PlayerRef (ZoneOf ZtDeque CardObjTp) ,
+    _hand :: IS.IndexedSet PlayerRef (ZoneOf ZtSet CardObjTp) ,
+    _graveyard :: IS.IndexedSet PlayerRef (ZoneOf ZtSet CardObjTp) ,
+    _exile :: ZoneOf ZtSet CardObjTp,
+    _battlefield :: ZoneOf ZtSet PermanentObjTp,
+    _stack :: ZoneOf ZtDeque StackItemObjTp
 }
 
-makeLenses ''ObjectZoneRef
+data {-- kind --} ZoneType = ZtDeque | ZtSet
+type family ZoneOf (zt :: ZoneType) = x | x -> zt where
+    ZoneOf ZtDeque = DequeZone
+    ZoneOf ZtSet = SetZone
 
-type instance Index Zones = ZoneRef
-type instance IxValue Zones = Zone 
+class Zone z where
+    type TypeOfObjects z :: ObjectType
+    ixObj :: ObjectRef -> AffineTraversal' z (ObjectOfType (TypeOfObjects z))
+
+newtype DequeZone (ot :: ObjectType) = MkDequeZone {_dzData :: ID.IndexedDeque ObjectRef (ObjectOfType ot) }
+newtype SetZone (ot :: ObjectType) = MkSetZone {_szData :: AIS.AutoIndexedSet ObjectRef (ObjectOfType ot) }
+
+makeLenses ''Zones
+makeLenses ''DequeZone
+makeLenses ''SetZone
+
+instance Empty Zones where empty = MkZones empty empty empty empty empty empty    
+instance Empty (DequeZone ot) where empty = MkDequeZone empty
+instance Empty (SetZone ot) where empty = MkSetZone empty
+
+instance Zone (DequeZone (ot :: ObjectType)) where
+    type TypeOfObjects (DequeZone ot) = ot
+    ixObj objRef = dzData % ix objRef
+
+instance Zone (SetZone (ot :: ObjectType)) where
+    type TypeOfObjects (SetZone ot) = ot
+    ixObj objRef = szData % ix objRef
+
+
+initializeZones :: [PlayerRef] -> Zones
+initializeZones ps = MkZones (zipEmptyD ps) (zipEmptyS ps) (zipEmptyS ps) empty empty empty
+    where
+        zipEmptyS = IS.fromList . map (,empty)
+        zipEmptyD = IS.fromList . map (,empty)
+
+class ZoneRef a where
+    type TypeOfZoneObjects a :: ObjectType
+    type TypeOfZone a :: ZoneType
+    ixZone :: a -> AffineTraversal' Zones (ZoneOf (TypeOfZone a) (TypeOfZoneObjects a))
+    ixZoneObj :: ObjectZoneRef a -> AffineTraversal' Zones (ObjectOfType (TypeOfZoneObjects a))
+
+type ObjectZoneRef a = ZoneRef a => (a, ObjectRef)
+data SomeZoneRef where SomeZoneRef :: ZoneRef a => a -> SomeZoneRef
+data SomeObjectZoneRef where SomeObjectZoneRef :: ZoneRef a => ObjectZoneRef a -> SomeObjectZoneRef
+    
+data LibraryZRef = LibraryZRef PlayerRef
+data HandZRef = HandZRef PlayerRef
+data GraveyardZRef = GraveyardZRef PlayerRef
+data ExileZRef = ExileZRef
+data BattlefieldZRef = BattlefieldZRef
+data StackZRef = StackZRef
+
+
+instance ZoneRef LibraryZRef where
+    type TypeOfZoneObjects LibraryZRef = CardObjTp
+    type TypeOfZone LibraryZRef = ZtDeque
+    ixZone (LibraryZRef p) = library % ix p
+    ixZoneObj (zoneRef, objRef) = ixZone zoneRef % ixObj objRef
+
+instance ZoneRef HandZRef where
+    type TypeOfZoneObjects HandZRef = CardObjTp
+    type TypeOfZone HandZRef = ZtSet
+    ixZone (HandZRef p) = hand % ix p
+    ixZoneObj (zoneRef, objRef) = ixZone zoneRef % ixObj objRef
+
+instance ZoneRef GraveyardZRef where
+    type TypeOfZoneObjects GraveyardZRef = CardObjTp
+    type TypeOfZone GraveyardZRef = ZtSet
+    ixZone (GraveyardZRef p) = graveyard % ix p
+    ixZoneObj (zoneRef, objRef) = ixZone zoneRef % ixObj objRef
+
+instance ZoneRef ExileZRef where
+    type TypeOfZoneObjects ExileZRef = CardObjTp
+    type TypeOfZone ExileZRef = ZtSet
+    ixZone ExileZRef = castOptic exile
+    ixZoneObj (zoneRef, objRef) = ixZone zoneRef % ixObj objRef
+
+instance ZoneRef BattlefieldZRef where
+    type TypeOfZoneObjects BattlefieldZRef = PermanentObjTp
+    type TypeOfZone BattlefieldZRef = ZtSet
+    ixZone BattlefieldZRef = castOptic battlefield
+    ixZoneObj (zoneRef, objRef) = ixZone zoneRef % ixObj objRef
+
+instance ZoneRef StackZRef where
+    type TypeOfZoneObjects StackZRef = StackItemObjTp
+    type TypeOfZone StackZRef = ZtDeque
+    ixZone StackZRef = castOptic stack
+    ixZoneObj (zoneRef, objRef) = ixZone zoneRef % ixObj objRef
+
+
+
+
+{--
+ixZone :: ZoneRef ot -> AffineTraversal' Zones (Zone zt ot)
+ixZone (Library p)   = library % ix p
+ixZone (Hand p)      = hand % ix p
+ixZone (Graveyard p) = graveyard % ix p
+ixZone Exile         = castOptic exile
+ixZone Battlefield   = castOptic battlefield
+ixZone Stack         = castOptic stack
+--}
+
+
+
+-- !!! Index and IxValue cannot be polymorphic
+{--
+type instance Index Zones = forall a. ZoneRef a -- !!! Index and IxValue cannot be polymorphic
+type instance IxValue Zones = forall a. Zone a  -- !!! Index and IxValue cannot be polymorphic
 instance Ixed Zones where
     type IxKind Zones = An_AffineTraversal
-    ix :: ZoneRef -> AffineTraversal' Zones Zone
+    ix :: ZoneRef a -> AffineTraversal' Zones (Zone a)
     ix zoneref = atraversal (\zs -> maybeToEither zs (solveZoneRef zoneref)) (\zs z -> modifyZoneRef zoneref (const z) zs)
+--}
 
+{-- Zones no longer have homomorphic data structures
 
-solveZoneRef :: ZoneRef a -> Zones -> Maybe (Zone a)
-solveZoneRef (Library p)   = find p . library
-solveZoneRef (Hand p)      = find p . hand
-solveZoneRef (Graveyard p) = find p . graveyard
-solveZoneRef Exile         = exile
-solveZoneRef Battlefield   = battlefield
-solveZoneRef Stack         = stack
+ixZone :: ZoneRef a -> AffineTraversal' Zones (Zone a)
+ixZone (Library p)   = library % ix p
+ixZone (Hand p)      = hand % ix p
+ixZone (Graveyard p) = graveyard % ix p
+ixZone Exile         = castOptic exile
+ixZone Battlefield   = castOptic battlefield
+ixZone Stack         = castOptic stack
 
-modifyZoneRef :: ZoneRef a -> (Zone a -> Zone a) -> Zones -> Zones
-modifyZoneRef ref f zs = let z = solveZoneRef ref in case ref of 
-    (Library p)   -> zs {library = D.modify f p z }
-    (Hand p)      -> zs {hand = D.modify f p z }
-    (Graveyard p) -> zs {graveyard = D.modify f p z }
-    Exile         -> zs {exile = f z }
-    Battlefield   -> zs {battlefield = f z }
-    Stack         -> zs {stack = f z }
+--}

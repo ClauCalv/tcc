@@ -2,7 +2,7 @@ module Magic.Server.ServerInterpreter where
 
 import Control.Algebra
 import Magic.Server.ServerCommunicator    
-import Data.Serializable (Serializable)
+import Data.Class.Serializable (Serializable)
 
 type QuestionValidation a b = a -> Either ServerText b
 data Question a where

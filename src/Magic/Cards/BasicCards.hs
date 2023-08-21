@@ -5,6 +5,8 @@ import Magic.Engine.Types.Object
 import Magic.Engine.Types.Color 
 import Magic.Engine.Types.Mana
 import Magic.Engine.Types.CardType
+import Magic.Engine.Types.Ability
+
 
 import Magic.Engine.Types.Effect.TapObjectEffect
 import Magic.Engine.Types.Effect.GainManaEffect
@@ -12,19 +14,21 @@ import Magic.Engine.Types.Effect.GainManaEffect
 import qualified Data.EnumSet as ES
 import qualified Data.EnumMultiSet as EMS
 
+import Optics
+
 simplePlay :: Activation
 simplePlay = emptyActivation
                 & prereq .~ [(SorcTime, OnHand)]
 
 simpleLandPlay :: Activation
-simplePlay = emptyActivation 
+simpleLandPlay = emptyActivation 
                 & prereq .~ [(LandTime, OnHand)]
 
 simpleTapAbility :: Ability
 simpleTapAbility = emptyAbility
                 & abilityTypes %~ ES.insert ActivatedAbility
                 & activation % prereq .~ [(InstTime, OnField)]
-                & activation % costs % othercosts ?= tapSelfEffect
+                & activation % costs % otherCosts ?~ tapSelfEffect
 
 manaTapAbility :: Ability
 manaTapAbility = simpleTapAbility
@@ -32,37 +36,38 @@ manaTapAbility = simpleTapAbility
                 & activation % prereq .~ [(InstTime, OnField)]
 
 basicLand :: Mana -> Card
-basicLand ColorlessMana = basicLand' ColorlessMana "Wastes"
-basicLand (ColoredMana W) = basicLand' (ColoredMana W) "Plains"
-basicLand (ColoredMana U) = basicLand' (ColoredMana U) "Island"
-basicLand (ColoredMana B) = basicLand' (ColoredMana B) "Swamp"
-basicLand (ColoredMana R) = basicLand' (ColoredMana R) "Mountain"
-basicLand (ColoredMana G) = basicLand' (ColoredMana G) "Forest"
+basicLand m = case m of
+    ColorlessMana       -> basicLand' m "Wastes"
+    (ColoredMana White) -> basicLand' m "Plains"
+    (ColoredMana Blue)  -> basicLand' m "Island"
+    (ColoredMana Black) -> basicLand' m "Swamp"
+    (ColoredMana Red)   -> basicLand' m "Mountain"
+    (ColoredMana Green) -> basicLand' m "Forest"
     where 
         basicLand' m n p = emptyCard p 
                             & name .~ n
                             & types % superTypes %~ ES.insert Basic
                             & types % cardTypes %~ ES.insert Land
                             & playAbility ?~ simpleLandPlay
-                            & _activatedAbilities .~ manatap m
+                            & activatedAbilities .~ [manatap m]
         manatap m = manaTapAbility
-                        & activation % effects .~ gainManaSelf m
+                        & activation % effects .~ gainManaSelf (EMS.singleton m)
 
 basicCreature :: ManaCost -> PowerToughness -> Card
 basicCreature m pt p = emptyCard p 
                         & types % cardTypes %~ ES.insert Creature
                         & powerToughness .~ pt
                         & playAbility ?~ simplePlay
-                        & playAbility %? activation % costs % manaCost .~ m
+                        & playAbility %? costs % manaCost .~ m
 
 
 wastes, plains, island, swamp, mountain, forest :: Card
 wastes   = basicLand ColorlessMana
-plains   = basicLand (ColoredMana W)
-island   = basicLand (ColoredMana U)
-swamp    = basicLand (ColoredMana B)
-mountain = basicLand (ColoredMana R)
-forest   = basicLand (ColoredMana G)
+plains   = basicLand (ColoredMana White)
+island   = basicLand (ColoredMana Blue)
+swamp    = basicLand (ColoredMana Black)
+mountain = basicLand (ColoredMana Red)
+forest   = basicLand (ColoredMana Green)
 
 testWarrior :: Card
-testWarrior = basicCreature (EMS.insertMany 2 GenericManaCost EMS.empty) (10,1)
+testWarrior = basicCreature (EMS.insertMany GenericManaCost 2 EMS.empty) (10,1)

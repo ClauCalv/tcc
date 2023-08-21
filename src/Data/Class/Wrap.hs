@@ -22,12 +22,16 @@
     -- GeneralizedNewtypeDeriving   -- Code shortening, unnecessary but useful.
 
     --TemplateHaskell                 -- For automatic code generation
+    , ImpredicativeTypes
 #-}
 
 module Data.Class.Wrap where
 
 import Data.Typeable
 import GHC.Exts
+
+data Some f where
+    MkSome :: f a -> Some f
 
 data Wrap (constraint :: * -> Constraint) where 
     MkWrap :: (Typeable a, constraint a) => a -> Wrap constraint
